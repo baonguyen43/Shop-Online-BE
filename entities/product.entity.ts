@@ -1,8 +1,9 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Category } from './category.entity';
 import { Supplier } from './supplier.entity';
 import { OrderDetail } from './orderDetails.entity';
+import { IsInt, IsNotEmpty, Length, Max, Min, validateOrReject } from 'class-validator';
 
 @Entity({ name: 'Products' })
 export class Product extends BaseEntity {
@@ -10,44 +11,61 @@ export class Product extends BaseEntity {
   id: number;
 
   // ----------------------------------------------------------------------------------------------
-  // NAME
+  // NAME PRODUCTs
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Tên sản phẩm không được bỏ trống"})
+  @Length(5,50, {message: 'Tên sản phẩm từ $constraint1 tới $constraint2'})
   @Column({ name: 'Name', type: 'nvarchar'})
   name: string;
 
   // ----------------------------------------------------------------------------------------------
   // PRICE
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Giá sản phẩm không được bỏ trống"})
+  @IsInt()
+  @Min(0,{message:' Giá không thể âm'})
   @Column({ name: 'Price', type: 'decimal', precision: 18, scale: 2 })
+  
   price: number;
 
   // ----------------------------------------------------------------------------------------------
   // DISCOUNT
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Giảm giá không được bỏ trống"})
+  @IsInt()
+  @Min(0)
+  @Max(75)
   @Column({ name: 'Discount', type: 'decimal', precision: 18, scale: 2, default: 0 })
   discount: number;
 
   // ----------------------------------------------------------------------------------------------
   // STOCK
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Tồn kho không được bỏ trống"})
+  @IsInt()
+  @Min(0,{message: "Số lượng tồn kho không hợp lệ"})
   @Column({ name: 'Stock', type: 'decimal', precision: 18, scale: 2, default: 0 })
   stock: number;
 
   // ----------------------------------------------------------------------------------------------
   // DESCRIPTION
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Mô tả không được bỏ trống"})
+  @Length(5,300,{message:"Mô tả không được ngắn hơn $constraint1 và dài hơn $constraint2 ký tự "})
   @Column({ name: 'Description', type: 'nvarchar', length: 'MAX', nullable: true })
   description: string;
 
   // ----------------------------------------------------------------------------------------------
   // CATEGORY ID
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Mã danh mục không được bỏ trống"})
   @Column({ type: 'int' })
   categoryId: number;
 
   // ----------------------------------------------------------------------------------------------
   // SUPPLIER ID
   // ----------------------------------------------------------------------------------------------
+  @IsNotEmpty({message:"Mã nhà cung cấp không được bỏ trống"})
   @Column({ type: 'int' })
   supplierId: number;
 
@@ -62,4 +80,10 @@ export class Product extends BaseEntity {
 
   @OneToMany(() => OrderDetail, (od) => od.product)
   orderDetails: OrderDetail[];
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async validate() {
+    await validateOrReject(this);
+  }
 }

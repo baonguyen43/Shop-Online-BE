@@ -14,8 +14,8 @@ export const AppDataSource = new DataSource({
   database: 'Onlineshop1',
   entities: ['entities/**/*.entity{.ts,.js}'],
   synchronize: false,
-  logging: false, 
+  logging: true, 
   options: {
-    encrypt: false, 
+    encrypt: false,
   },
 });

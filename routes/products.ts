@@ -24,7 +24,7 @@ router.get('/', async (req: Request, res: Response, next: any) => {
   }
 });
 
-/* GET product by id */
+/* GET product by id */  
 router.get('/:id', async (req: Request, res: Response, next: any) => {
   try {
     const product = await repository
@@ -33,6 +33,22 @@ router.get('/:id', async (req: Request, res: Response, next: any) => {
       .leftJoinAndSelect('product.supplier', 'supplier')
       .where('product.id = :id', { id: parseInt(req.params.id) })
       .getOne();
+    if (!product) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+//lấy sản phâm theo cateid
+router.get('/category/:id', async (req: Request, res: Response, next: any) => {
+  try {
+    const product = await repository
+      .createQueryBuilder('product')
+      .where('product.CategoryId = :id', { id: parseInt(req.params.id) })
+      .getMany();
     if (!product) {
       return res.status(404).json({ error: 'Not found' });
     }
@@ -97,4 +113,13 @@ router.delete('/:id', async (req: Request, res: Response, next: any) => {
   }
 });
 
+/* SEARCH product */
+// router.get('/search',  async(req: Request, res: Response, next: any) => {
+//   try {
+//     const { name, categoryId, priceStart, priceEnd, supplierId, } = req.query;
+//     if(name) name = fuzzySearch(name); 
+//   } catch (error) {
+//     return res.status(404).json({error:'Không tìm thấy'})
+//   }
+// })
 export default router;

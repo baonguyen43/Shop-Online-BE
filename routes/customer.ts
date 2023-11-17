@@ -38,17 +38,17 @@ router.get('/:id', async (req: Request, res: Response, next: any) => {
 
 /* Create customer */
 router.post('/', async (req: Request, res: Response, next: any) => {
-  try {
+  
+try {
     
     const customer = new Customer();
     Object.assign(customer, req.body);
+
     await repository.save(customer);
     res.status(201).json(customer);
-    console.log('Nguyenne customer Nguyenne', customer);
   } catch (error) {
-    
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(400).json({ error });
   }
 });
 

@@ -12,10 +12,17 @@ import suppliersRouter from './routes/suppliers';
 import customerRouter from './routes/customer';
 import employeeRouter from './routes/employees';
 import ordersRouter from './routes/orders';
+import authRouter from './routes/auth'; 
 
+const cors = require("cors");
 
 const app: Express = express();
-
+//ADD CORS 
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 AppDataSource.initialize().then(async () => {
   console.log('Data source initialized');
 
@@ -26,6 +33,7 @@ AppDataSource.initialize().then(async () => {
   app.use(express.static(path.join(__dirname, 'public')));
   
   app.use('/', indexRouter);
+  app.use('/auth', authRouter);
   app.use('/categories', categoriesRouter);
   app.use('/products', productsRouter);
   app.use('/suppliers', suppliersRouter);
@@ -34,8 +42,9 @@ AppDataSource.initialize().then(async () => {
   app.use('/orders', ordersRouter);
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {
-    next(createError(404));
-  });
+    res.status(404).send('Not found');
+    // next(createError(404));
+  }); 
 
   // error handler
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {

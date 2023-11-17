@@ -44,11 +44,10 @@ router.post('/', async (req: Request, res: Response, next: any) => {
     Object.assign(employee, req.body);
     await repository.save(employee);
     res.status(201).json(employee);
-    console.log('Nguyenne employee Nguyenne', employee);
   } catch (error) {
     
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(400).json({ error });
   }
 });
 

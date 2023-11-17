@@ -3,6 +3,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { OrderDetail } from '../entities/orderDetails.entity';
 import { Order } from '../entities/order.entity';
+import { validate } from 'class-validator';
 
 const router = express.Router();
 
@@ -101,36 +102,41 @@ router.get('/:id', async (req: Request, res: Response, next: any) => {
 /* POST order */
 router.post('/', async (req: Request, res: Response, next: any) => {
   try {
-    const queryRunner = repository.manager.connection.createQueryRunner();
-    await queryRunner.connect();
-    // Begin transaction
-    try {
-      await queryRunner.startTransaction();
+    const order = new Order();
+    Object.assign(order, req.body);
+    await repository.save(order);
+    res.status(201).json(order);
 
-      const order = req.body as Order;
+    // const queryRunner = repository.manager.connection.createQueryRunner();
+    // await queryRunner.connect();
+    // // Begin transaction
+    // try {
+    //   await queryRunner.startTransaction();
 
-      // Lưu thông tin order
-      const result = await queryRunner.manager.save(Order, order);
+    //   const order = req.body as Order;
 
-      // Lưu thông tin order details
-      const orderDetails = order.orderDetails.map((od) => {
-        return { ...od, orderId: result.id };
-      });
+    //   // Lưu thông tin order
+    //   const result = await queryRunner.manager.save(Order, order);
 
-      await queryRunner.manager.save(OrderDetail, orderDetails);
+    //   // Lưu thông tin order details
+    //   const orderDetails = order.orderDetails.map((od) => {
+    //     return { ...od, orderId: result.id };
+    //   });
 
-      // Commit transaction
-      await queryRunner.commitTransaction();
+    //   await queryRunner.manager.save(OrderDetail, orderDetails);
 
-      // Get order by id
-      res.redirect(`/orders/${result.id}`);
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      res.status(500).json({ error: 'Transaction failed' });
-    }
+    //   // Commit transaction
+    //   await queryRunner.commitTransaction();
+
+    //   // Get order by id
+    //   res.redirect(`/orders/${result.id}`);
+    // } catch (error) {
+    //   await queryRunner.rollbackTransaction();
+    //   res.status(400).json({ error });
+    // }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(400).json({ error });
   }
 });
 
