@@ -3,6 +3,7 @@ const fuzzySearch = (text: string) => {
 
   return new RegExp(regex, "gi");
 };
+
 module.exports = {
   fuzzySearch,
 };

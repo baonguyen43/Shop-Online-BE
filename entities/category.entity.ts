@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, BaseEntity, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Product } from './product.entity';
-import { IsNotEmpty, Length, validateOrReject,  } from 'class-validator';
-
+import { IsNotEmpty, Length, Validate, validateOrReject,  } from 'class-validator';
 
 
 @Entity({ name: 'Categories' })

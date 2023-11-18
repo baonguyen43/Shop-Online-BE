@@ -6,11 +6,14 @@ import path from 'path';
 
 import { AppDataSource } from './data-source';
 import indexRouter from './routes/index';
-import categoriesRouter from './routes/categories';
-import productsRouter from './routes/products';
-import suppliersRouter from './routes/suppliers';
-import customerRouter from './routes/customer';
-import employeeRouter from './routes/employees';
+import categoryRouter from './routes/category/router';
+import customerRouter from './routes/customer/router'
+import employeeRouter from './routes/employee/router';
+import suppliersRouter from './routes/supplier/router';
+import productsRouter from './routes/product/router';
+
+
+// import productsRouter from './routes/products';
 import ordersRouter from './routes/orders';
 import authRouter from './routes/auth'; 
 
@@ -34,7 +37,7 @@ AppDataSource.initialize().then(async () => {
   
   app.use('/', indexRouter);
   app.use('/auth', authRouter);
-  app.use('/categories', categoriesRouter);
+  app.use('/categories', categoryRouter);
   app.use('/products', productsRouter);
   app.use('/suppliers', suppliersRouter);
   app.use('/customers', customerRouter)
