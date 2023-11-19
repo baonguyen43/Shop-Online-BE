@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { AppDataSource } from "../../data-source";
 import { Employee } from "../../entities/employee.entity";
 import { Product } from '../../entities/product.entity';
-// import {fuzzySearch} from "./../../helper/index"; 
+import {fuzzySearch} from "../../helper/index"; 
 const repository = AppDataSource.getRepository(Product);
 
 module.exports = {
@@ -130,7 +130,34 @@ module.exports = {
 
     search:  async (req: Request, res: Response, next: any) => {
         try {
-            
+          const { name, categoryId, supplierId } = req.query;
+          let searchName: RegExp | string = '';
+      if (typeof name === 'string') {
+        searchName = fuzzySearch(name);
+      }
+      const queryBuilder = Product
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.supplier', 'supplier');
+
+      if (searchName) {
+        queryBuilder.andWhere('product.name LIKE :name', { name: `%${searchName}%`});
+      }
+    if (categoryId ) {
+      queryBuilder.andWhere('product.CategoryId = :categoryId', { categoryId });
+    }
+
+    if (supplierId ) {
+      queryBuilder.andWhere('product.SupplierId = :supplierId', { supplierId });
+    }
+
+    const result = await queryBuilder.getMany();
+    if (result.length === 0) {
+      res.status(204).send();
+    } else {
+      res.json(result);
+    }
+
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });

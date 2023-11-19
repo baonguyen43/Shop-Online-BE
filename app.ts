@@ -11,10 +11,11 @@ import customerRouter from './routes/customer/router'
 import employeeRouter from './routes/employee/router';
 import suppliersRouter from './routes/supplier/router';
 import productsRouter from './routes/product/router';
+import ordersRouter from './routes/order/router';
 
+// import cardRouter from './routes/cart/router';
 
 // import productsRouter from './routes/products';
-import ordersRouter from './routes/orders';
 import authRouter from './routes/auth'; 
 
 const cors = require("cors");
@@ -43,6 +44,9 @@ AppDataSource.initialize().then(async () => {
   app.use('/customers', customerRouter)
   app.use('/employees', employeeRouter)
   app.use('/orders', ordersRouter);
+  // app.use('/cart', cardRouter)
+
+
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {
     res.status(404).send('Not found');

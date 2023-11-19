@@ -1,10 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert, BeforeUpdate } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert, BeforeUpdate, BaseEntity } from "typeorm";
 import { Order } from "./order.entity";
 import { IsBtcAddress, IsDate, IsDateString, IsEmail, IsInt, IsNotEmpty, IsPhoneNumber, Length, Max, validateOrReject } from "class-validator";
 // import { IsNotEmpty, MaxLength } from 'class-validator';
 
 @Entity({ name: "Customers" })
-export class Customer {
+export class Customer extends BaseEntity {
   // ----------------------------------------------------------------------------------------------
   // ID
   // ----------------------------------------------------------------------------------------------
