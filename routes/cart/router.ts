@@ -6,8 +6,6 @@ const {getAll, getDetail, create, update, softDelete } = require("./controller")
 
 router.route("/").get(getAll).post(create); 
 
-router.route("/register").post(create); 
-
 router.route("/:id")
         .get(getDetail)
         .put(update); 

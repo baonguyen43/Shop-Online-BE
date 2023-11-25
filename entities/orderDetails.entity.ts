@@ -21,6 +21,7 @@ export class OrderDetail {
   @Column({ name: 'Discount', type: 'decimal', precision: 18, scale: 2, default: 0 })
   discount: number;
 
+    // RELATIVE
   @ManyToOne(() => Product, (p) => p.orderDetails)
   product: Product;
 

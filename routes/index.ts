@@ -49,6 +49,19 @@ router.get('/call-stored-procedure', async (req: Request, res: Response, next: a
   }
 });
 
+// Get Products by Discount >= 45 
+router.get('/super-sale', async (req: Request, res: Response, next: any) => {
+  try {
+    const query = 'SELECT * FROM Products as p WHERE p.Discount >= 40';
+    const results = await repository.manager.connection.query(query);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 // Hiển thị năm sinh của khách hàng 
 router.get('/customers/get-by-year-of-birthday/:year', async (req: Request, res: Response, next: any) => {

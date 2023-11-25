@@ -33,10 +33,12 @@ module.exports = {
     }, 
     create: async (req: Request, res: Response, next: any) => {
         try {
-    
+          const {password } = req.body;
             const customer = new Customer();
             Object.assign(customer, req.body);
-        
+            customer.password = password;
+            await customer.hashPassword ; 
+            
             await repository.save(customer);
             res.status(201).json(customer);
           } catch (error) {

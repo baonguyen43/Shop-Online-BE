@@ -5,7 +5,6 @@ import { Category } from '../../entities/category.entity';
 
 const repository = AppDataSource.getRepository(Category);
 
-/* GET categories */
 module.exports = {
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
