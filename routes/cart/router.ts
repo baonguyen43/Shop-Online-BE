@@ -1,14 +1,17 @@
 import express from 'express';
 
+const {validateSchema} = require("../../helper/index")
+const { getDetailSchema, removeSchema, createSchema } = require("./validation");
+
 
 const router = express.Router();
-const {getAll, getDetail, create, update, softDelete } = require("./controller")
+const {remove, getDetail, create } = require("./controller")
 
-router.route("/").get(getAll).post(create); 
+router.route("/")
+.post(validateSchema(createSchema),create)
+.delete(validateSchema(removeSchema), remove);
 
-router.route("/:id")
-        .get(getDetail)
-        .put(update); 
+router.route("/:id").get(validateSchema(getDetailSchema), getDetail);
 
-router.patch("/delete/:id", softDelete);
+
 export default router;

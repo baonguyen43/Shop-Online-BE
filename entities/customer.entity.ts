@@ -5,7 +5,7 @@ import { Cart } from "./cart.entity";
 // import { IsNotEmpty, MaxLength } from 'class-validator';
 const bcrypt = require('bcryptjs')
 
-@Entity({ name: "Customers" })
+@Entity ({ name: "Customers" })
 export class Customer extends BaseEntity {
   // ----------------------------------------------------------------------------------------------
   // ID
@@ -69,6 +69,7 @@ export class Customer extends BaseEntity {
   @IsNotEmpty ({ message: 'Password không được bỏ trống'}) 
   @MinLength(5, { message: 'Không được ít hơn 5 ký tự' })
   @MaxLength(12, { message: 'Không được vượt quá 12 ký tự' })
+  @Column({ name: "Password", type: 'nvarchar',  nullable: true  })
   password: string;
 
   // ----------------
@@ -88,6 +89,8 @@ export class Customer extends BaseEntity {
       await validateOrReject(this);
     }
 
+    @BeforeInsert()
+    @BeforeUpdate()
     async hashPassword() {
       if (this.password) {
         const salt = await bcrypt.genSalt(10);
@@ -103,58 +106,3 @@ export class Customer extends BaseEntity {
     }
 
 }
-
-
-
-
-// export class CreateUser {
-//   @IsString()
-//   @MaxLength(50, { message: 'Họ được vượt quá 50 ký tự' })
-//   firstName: string;
-
-//   @IsString()
-//   @MaxLength(50, { message: 'Tên được vượt quá 50 ký tự' })
-//   lastName: string;
-
-//   @IsEmail({}, { message: 'Email không hợp lệ' })
-//   email: string;
-
-//   @IsPhoneNumber('VN', { message: 'Số điện thoại không hợp lệ' })
-//   phoneNumber: string;
-
-//   @IsString()
-//   @MinLength(3, { message: 'Không được ít hơn 3 ký tự' })
-//   @MaxLength(12, { message: 'Không được vượt quá 12 ký tự' })
-//   password: string;
-// }
-// export class LoginUser {
-//   @IsEmail({}, { message: 'Email không hợp lệ' })
-//   email: string;
-
-//   @IsString()
-//   @MinLength(3, { message: 'Không được ít hơn 3 ký tự' })
-//   @MaxLength(12, { message: 'Không được vượt quá 12 ký tự' })
-//   password: string;
-// }
-
-// const validateCreateUser = async (data: CreateUser) => {
-//   const errors = await validate(data);
-//   if (errors.length > 0) {
-//     throw new Error('Tạo thất bại');
-//   }
-// };
-
-// const validateLoginUser = async (data: LoginUser) => {
-//   const errors = await validate(data);
-//   if (errors.length > 0) {
-//     throw new Error('Đăng nhập thất bại');
-//   }
-// };
-
-// export const createSchema = {
-//   body: Customer,
-// };
-
-// export const loginSchema = {
-//   body: LoginUser,
-// };

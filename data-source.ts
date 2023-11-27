@@ -18,4 +18,6 @@ export const AppDataSource = new DataSource({
   options: {
     encrypt: false,
   },
+  migrations: ['migrations/*.ts'], 
+
 });

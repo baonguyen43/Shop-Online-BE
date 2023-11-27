@@ -1,11 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { AppDataSource } from "../../data-source";
-import { Employee } from "../../entities/employee.entity";
-import { Product } from '../../entities/product.entity';
-import {fuzzySearch} from "../../helper/index"; 
 import { Order } from '../../entities/order.entity';
 import { OrderDetail } from '../../entities/orderDetails.entity';
-import { In, Not } from 'typeorm';
 
 const repository = AppDataSource.getRepository(Order);
 

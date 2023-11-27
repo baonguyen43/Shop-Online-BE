@@ -31,16 +31,18 @@ module.exports = {
             res.status(500).json({ error: 'Internal server error' });
           }
     }, 
+
     create: async (req: Request, res: Response, next: any) => {
         try {
-          const {password } = req.body;
+          const {password, ...customerData  } = req.body;
             const customer = new Customer();
-            Object.assign(customer, req.body);
+            Object.assign(customer, customerData);
             customer.password = password;
             await customer.hashPassword ; 
             
-            await repository.save(customer);
-            res.status(201).json(customer);
+      const createdCustomer = await repository.save(customer);
+      res.status(201).json(createdCustomer);
+
           } catch (error) {
             console.error(error);
             res.status(400).json({ error });
@@ -69,8 +71,8 @@ module.exports = {
             if (!customer) {
               return res.status(404).json({ error: 'Not found' });
             }
-            await repository.delete({ id: customer.id });
-            res.status(200).send('delete thanh cong');
+            await repository.softDelete(req.params.id);
+            res.status(200).send('Delete thanh cong');
           } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });

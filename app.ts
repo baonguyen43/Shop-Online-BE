@@ -12,6 +12,8 @@ import employeeRouter from './routes/employee/router';
 import suppliersRouter from './routes/supplier/router';
 import productsRouter from './routes/product/router';
 import ordersRouter from './routes/order/router';
+import loginRouter from './routes/login/router';
+
 
 // import cardRouter from './routes/cart/router';
 
@@ -44,6 +46,8 @@ AppDataSource.initialize().then(async () => {
   app.use('/customers', customerRouter)
   app.use('/employees', employeeRouter)
   app.use('/orders', ordersRouter);
+  app.use('/login', loginRouter);
+
   // app.use('/cart', cardRouter)
 
 
