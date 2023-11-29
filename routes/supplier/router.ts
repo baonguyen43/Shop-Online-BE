@@ -1,6 +1,6 @@
 import express from 'express';
 
-const {validateSchema} = require("../../helper/index")
+const {validateSchema} = require("../../helper/validateSchema")
 const {validationSchema} = require("./validation");
 const router = express.Router();
 const {getAll, getDetail, create, update, softDelete } = require("./controller")

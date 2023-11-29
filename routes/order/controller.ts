@@ -137,28 +137,30 @@ module.exports = {
           }
     }, 
 
-    // updateStatus:async (req: Request, res: Response, next: any) => {
-    //     try {
-    //         const status = await repository.findOneOrFail({
-    //             where: {
-    //               id: parseInt(req.params.id),
-    //               status: Not(In(["CANCELED", "WAITTING", "COMPLETED"])),
-    //             },
-    //           });
-        
-    //           if (status) {
-    //             await repository.update(status.id, { status });
-          
-    //             const updatedStatus = await repository.findOneOrFail(status.id);
-    //             res.json(updatedStatus);
-    //           } else {
-    //             res.status(404).json({ message: "Status not found" });
-    //           }
-    //       } catch (error) {
-    //         console.error(error);
-    //         res.status(500).json({ error: "Internal server error" });
-    //       }
-    // }, 
+    updateStatus:async (req: Request, res: Response, next: any) => {
+      try {
+        const  id  = req.params;
+        const { status } = req.body;
+    
+        // Kiểm tra xem order có tồn tại không
+        const order = await repository.findOne(id);
+        if (!order) {
+          return res.status(404).json({ error: 'Order not found' });
+        }
+    
+        // Cập nhật trạng thái của order
+        if (status === 'CANCELED' || status === 'REJECTED' || status === 'COMPLETED') {
+          order.status = status;
+          await repository.save(order);
+          res.json(order);
+        } else {
+          res.status(400).json({ error: 'Invalid status' });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    }, 
 
     
 }

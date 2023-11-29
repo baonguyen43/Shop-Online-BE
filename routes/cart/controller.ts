@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../data-source';
-import { CartDetails } from '../../entities/cardDetails.entity';
+import { CartDetails } from '../../entities/cartDetails.entity';
 import { Cart } from '../../entities/cart.entity';
 import { Customer } from '../../entities/customer.entity';
 import { Product } from '../../entities/product.entity';
@@ -34,6 +34,7 @@ module.exports = {
         });
       }
     }, 
+    
     create: async (req: Request, res: Response, next: any) => {
         try {
           const { customerId, productId, quantity } = req.body;
@@ -65,11 +66,30 @@ module.exports = {
           }
     }, 
 
-
-    
     remove:async (req: Request, res: Response, next: any) => {
       try {
-        
+        const { customerId, productId } = req.body;
+        const cart = await cartRepository.findOne(customerId);
+    
+        if (!cart) {
+          return res.status(404).json({ error: 'Không tìm thấy giỏ hàng' });
+        }
+    
+        if (cart.products.length === 1 &&
+           cart.products[0].productId === productId) {
+          await cartRepository.remove(cart);
+    
+          return res.status(200).json({ message: 'Đã xóa giỏ hàng' });
+        }
+        else 
+        {
+        const updatedProducts = cart.products.filter(product => product.productId !== productId);
+    
+        cart.products = updatedProducts;
+        await cartRepository.save(cart)
+          
+        }
+        return res.status(200).json({ message: 'Đã cập nhật giỏ hàng' });
       } catch (error) {
         return res.status(500).json({ code: 500, error: error });
         

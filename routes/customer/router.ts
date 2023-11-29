@@ -2,7 +2,7 @@ import express from 'express';
 
 
 const router = express.Router();
-const {validateSchema} = require("../../helper/index")
+const {validateSchema} = require("../../helper/validateSchema")
 const {getDetailSchema, createSchema} = require("./validation")
 
 const {getAll, getDetail, create, update, softDelete } = require("./controller")

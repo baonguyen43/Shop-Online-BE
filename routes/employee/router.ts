@@ -1,6 +1,6 @@
 import express from 'express';
 
-const {validateSchema} = require("../../helper/index")
+const {validateSchema} = require("../../helper/validateSchema")
 const {getDetailSchema, createSchema} = require("./validation")
 
 const router = express.Router();

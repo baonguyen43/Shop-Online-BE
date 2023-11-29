@@ -4,7 +4,7 @@ import { Category } from './category.entity';
 import { Supplier } from './supplier.entity';
 import { OrderDetail } from './orderDetails.entity';
 import { IsInt, IsNotEmpty, Length, Max, Min, validateOrReject } from 'class-validator';
-import { CartDetails } from './cardDetails.entity';
+import { CartDetails } from './cartDetails.entity';
 
 @Entity({ name: 'Products' })
 export class Product extends BaseEntity {
@@ -91,7 +91,7 @@ export class Product extends BaseEntity {
   orderDetails: OrderDetail[];
 
   @OneToMany(() => CartDetails, (cd) => cd.product)
-  cardDetails: CartDetails[];
+  cartDetails: CartDetails[];
   
   @BeforeInsert()
   @BeforeUpdate()
