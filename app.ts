@@ -15,7 +15,7 @@ import suppliersRouter from "./routes/supplier/router";
 import productsRouter from "./routes/product/router";
 import ordersRouter from "./routes/order/router";
 import loginRouter from "./routes/login/router";
-
+import cartRouter from "./routes/cart/router";
 const {
   passportVerifyAccount,
   passportVerifyToken,
@@ -53,13 +53,9 @@ AppDataSource.initialize().then(async () => {
   app.use("/customers", customerRouter);
   app.use("/employees", employeeRouter);
   app.use("/orders", ordersRouter);
-  app.use(
-    "/login",
-    // passport.authenticate("jwt", { session: false }),
-    loginRouter
-  );
+  app.use("/login", loginRouter);
 
-  // app.use('/cart', cardRouter)
+  app.use("/cart", cartRouter);
 
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {

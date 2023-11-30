@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../data-source';
-import { CartDetails } from '../../entities/cartDetails.entity';
 import { Cart } from '../../entities/cart.entity';
 import { Customer } from '../../entities/customer.entity';
 import { Product } from '../../entities/product.entity';
 
 
 const cartRepository = AppDataSource.getRepository(Cart);
-const cartDetailRepository = AppDataSource.getRepository(CartDetails);
 
 const productRepository = AppDataSource.getRepository(Product);
 const customerRepository = AppDataSource.getRepository(Customer);
@@ -38,11 +36,15 @@ module.exports = {
     create: async (req: Request, res: Response, next: any) => {
         try {
           const { customerId, productId, quantity } = req.body;
-    const customer = await customerRepository.findOne(customerId);
+    const customer = await customerRepository.findOneBy(customerId);
+    console.log(customer);
     if (!customer) {
       return res.status(404).json({ error: 'Khách hàng không tồn tại' });
     }
-    const product = await productRepository.findOne(productId);
+    const product = await productRepository.findOneBy(productId);
+    console.log(product);
+    console.log(quantity);
+    
     if (!product) {
       return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
     }
@@ -52,50 +54,48 @@ module.exports = {
     }
     const cart = new Cart();
     cart.customer = customer;
-    const cartDetails = new CartDetails();
-    cartDetails.product = product;
-    cartDetails.quantity = quantity;
-    cartDetails.cart = cart;
-
+    cart.product = product;
+    cart.quantity = quantity;
     await cartRepository.save(cart);
-    await cartDetailRepository.save(cartDetails);
 
+     
+    res.json(cart);
           } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });
           }
     }, 
 
-    remove:async (req: Request, res: Response, next: any) => {
-      try {
-        const { customerId, productId } = req.body;
-        const cart = await cartRepository.findOne(customerId);
+    // remove:async (req: Request, res: Response, next: any) => {
+    //   try {
+    //     const { customerId, productId } = req.body;
+    //     const cart = await cartRepository.findOne(customerId);
     
-        if (!cart) {
-          return res.status(404).json({ error: 'Không tìm thấy giỏ hàng' });
-        }
+    //     if (!cart) {
+    //       return res.status(404).json({ error: 'Không tìm thấy giỏ hàng' });
+    //     }
     
-        if (cart.products.length === 1 &&
-           cart.products[0].productId === productId) {
-          await cartRepository.remove(cart);
+    //     if (cart.Length === 1 &&
+    //        cart.productId === productId) {
+    //       await cartRepository.remove(cart);
     
-          return res.status(200).json({ message: 'Đã xóa giỏ hàng' });
-        }
-        else 
-        {
-        const updatedProducts = cart.products.filter(product => product.productId !== productId);
+    //       return res.status(200).json({ message: 'Đã xóa giỏ hàng' });
+    //     }
+    //     else 
+    //     {
+    //     const updatedProducts = cart.cartDetails.filter(p => p.productId !== productId);
     
-        cart.products = updatedProducts;
-        await cartRepository.save(cart)
+    //     cart.cartDetails = updatedProducts;
+    //     await cartRepository.save(cart)
           
-        }
-        return res.status(200).json({ message: 'Đã cập nhật giỏ hàng' });
-      } catch (error) {
-        return res.status(500).json({ code: 500, error: error });
+    //     }
+    //     return res.status(200).json({ message: 'Đã cập nhật giỏ hàng' });
+    //   } catch (error) {
+    //     return res.status(500).json({ code: 500, error: error });
         
-      }
+    //   }
     
-    }
+    // }
  
 }
 

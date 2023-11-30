@@ -1,10 +1,10 @@
 import { BaseEntity, BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Category } from './category.entity';
-import { Supplier } from './supplier.entity';
-import { OrderDetail } from './orderDetails.entity';
 import { IsInt, IsNotEmpty, Length, Max, Min, validateOrReject } from 'class-validator';
-import { CartDetails } from './cartDetails.entity';
+import { Cart } from './cart.entity';
+import { Category } from './category.entity';
+import { OrderDetail } from './orderDetails.entity';
+import { Supplier } from './supplier.entity';
 
 @Entity({ name: 'Products' })
 export class Product extends BaseEntity {
@@ -90,8 +90,8 @@ export class Product extends BaseEntity {
   @OneToMany(() => OrderDetail, (od) => od.product)
   orderDetails: OrderDetail[];
 
-  @OneToMany(() => CartDetails, (cd) => cd.product)
-  cartDetails: CartDetails[];
+  @OneToMany(() => Cart, (cd) => cd.product)
+  cart: Cart[];
   
   @BeforeInsert()
   @BeforeUpdate()
