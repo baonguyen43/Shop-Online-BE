@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { AppDataSource } from '../../data-source';
 import { Cart } from '../../entities/cart.entity';
 import { Customer } from '../../entities/customer.entity';
@@ -13,27 +13,12 @@ const customerRepository = AppDataSource.getRepository(Customer);
 
 
 module.exports = {
-  getAll: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const carts = await cartRepository.find();
-        if (carts.length === 0) {
-          res.status(204).send();
-        } else {
-          res.json(carts);
-        }
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
-      }
-},
     getDetail: async (req: Request, res: Response, next: any) => {
       try {
         const { id } = req.params;
         const customerId = parseInt(id);
-        console.log('customerId :>> ', customerId);
 
-        const  result = await cartRepository.findOneBy({customerId: customerId });
-        console.log('result :>> ', result);
+        const  result = await cartRepository.findOneBy({customerId });
     
         if (result) {
           return res.send({ code: 200, payload: result });
@@ -51,13 +36,12 @@ module.exports = {
     create: async (req: Request, res: Response, next: any) => {
         try {
           const { customerId, productId, quantity } = req.body;
-
-    const customer = await customerRepository.findOneBy({id: customerId as number});
+    const customer = await customerRepository.findOneBy(customerId);
     console.log(customer);
     if (!customer) {
       return res.status(404).json({ error: 'Khách hàng không tồn tại' });
     }
-    const product = await productRepository.findOneBy({id: productId as number});
+    const product = await productRepository.findOneBy(productId);
     console.log(product);
     console.log(quantity);
     
@@ -72,10 +56,10 @@ module.exports = {
     cart.customer = customer;
     cart.product = product;
     cart.quantity = quantity;
-    const result = await cartRepository.save(cart);
+    await cartRepository.save(cart);
 
      
-    res.json(result);
+    res.json(cart);
           } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });
