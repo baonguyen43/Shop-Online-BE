@@ -5,12 +5,11 @@ const { getDetailSchema, removeSchema, createSchema } = require("./validation");
 
 
 const router = express.Router();
-const {remove, getDetail, create } = require("./controller")
+const {getAll, getDetail, create } = require("./controller")
 
-router.route("/")
-.post(validateSchema(createSchema),create)
+router.route("/").post(validateSchema(createSchema),create)
 // .delete(validateSchema(removeSchema), remove);
-
+router.route("/").get(getAll)
 router.route("/:id").get(validateSchema(getDetailSchema), getDetail);
 
 

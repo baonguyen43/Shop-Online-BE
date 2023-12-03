@@ -25,13 +25,8 @@ export class Cart {
 
     @PrimaryColumn({ type: 'int' })
     productId: number;
-  // @IsNotEmpty()
-  // @Column()
-  // products: CartDetails[];
 
   // RELATIVE
- 
-
   @ManyToOne(() => Customer, { eager: true })
   @JoinColumn({ name: "customerId" })
   customer: Customer;
