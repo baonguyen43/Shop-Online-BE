@@ -3,10 +3,9 @@
 /**
  * Module dependencies.
  */
-
-import app from '../app';
+const app = require('../app');
 const debug = require('debug')('express-typescript:server');
-import http from 'http';
+const http = require('http');
 
 // const app = require('./app');
 // const debug = require('debug')('express-typescript:server');
