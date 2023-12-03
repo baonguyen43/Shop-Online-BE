@@ -4,13 +4,13 @@
  * Module dependencies.
  */
 
-// import app from '../app';
-// const debug = require('debug')('express-typescript:server');
-// import http from 'http';
-
-const app = require('./app');
+import app from '../app';
 const debug = require('debug')('express-typescript:server');
-const http = require('http');
+import http from 'http';
+
+// const app = require('./app');
+// const debug = require('debug')('express-typescript:server');
+// const http = require('http');
 
 /**
  * Get port from environment and store in Express.
@@ -37,7 +37,7 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val:any) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -57,7 +57,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error:any) {
   if (error.syscall !== 'listen') {
     throw error;
   }
