@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www.ts",
+    "start": "ts-node-dev --respawn --transpile-only ./bin/www.ts",
     "dev": "ts-node-dev --respawn --transpile-only --exit-child bin/www.ts",
-    "build": "npx tsc -p tsconfig.json"
+    "build": "npx tsc -p"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

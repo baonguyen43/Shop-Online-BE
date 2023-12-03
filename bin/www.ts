@@ -3,30 +3,9 @@
 /**
  * Module dependencies.
  */
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-// import app from '../app';
-=======
-=======
->>>>>>> c3b3c07cd14d8878f81b5aebf691ac948ed369fe
-const app = require('../app');
+import app from '../app';
 const debug = require('debug')('express-typescript:server');
-const http = require('http');
-
-// const app = require('./app');
->>>>>>> c3b3c07 (fix bin 4)
-// const debug = require('debug')('express-typescript:server');
-<<<<<<< HEAD
-// import http from 'http';
-
-const app = require('./app');
-const debug = require('debug')('express-typescript:server');
-const http = require('http');
-=======
-// const http = require('http');
->>>>>>> c3b3c07cd14d8878f81b5aebf691ac948ed369fe
-
+import http from 'http';
 /**
  * Get port from environment and store in Express.
  */
