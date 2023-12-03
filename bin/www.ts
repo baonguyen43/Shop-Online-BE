@@ -7,7 +7,9 @@
 import app from '../app';
 const debug = require('debug')('express-typescript:server');
 import http from 'http';
-
+// const app = require('./app');
+// const debug = require('debug')('express-typescript:server');
+// const http = require('http');
 /**
  * Get port from environment and store in Express.
  */
@@ -33,7 +35,7 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val: any) {
+function normalizePort(val:any) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -53,7 +55,7 @@ function normalizePort(val: any) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error: any) {
+function onError(error:any) {
   if (error.syscall !== 'listen') {
     throw error;
   }
