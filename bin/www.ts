@@ -4,12 +4,14 @@
  * Module dependencies.
  */
 
-import app from '../app';
-const debug = require('debug')('express-typescript:server');
-import http from 'http';
-// const app = require('./app');
+// import app from '../app';
 // const debug = require('debug')('express-typescript:server');
-// const http = require('http');
+// import http from 'http';
+
+const app = require('./app');
+const debug = require('debug')('express-typescript:server');
+const http = require('http');
+
 /**
  * Get port from environment and store in Express.
  */
