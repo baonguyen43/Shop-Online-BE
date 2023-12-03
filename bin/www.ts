@@ -3,8 +3,16 @@
 /**
  * Module dependencies.
  */
+<<<<<<< HEAD
 
 // import app from '../app';
+=======
+const app = require('../app');
+const debug = require('debug')('express-typescript:server');
+const http = require('http');
+
+// const app = require('./app');
+>>>>>>> c3b3c07 (fix bin 4)
 // const debug = require('debug')('express-typescript:server');
 // import http from 'http';
 
