@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-import app from '..';
+import app from '../app';
 const debug = require('debug')('express-typescript:server');
 import http from 'http';
 /**

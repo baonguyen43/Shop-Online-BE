@@ -1,91 +1,175 @@
-import cookieParser from "cookie-parser";
-import express, { Express, NextFunction, Request, Response } from "express";
-import createError from "http-errors";
-import logger from "morgan";
-import path from "path";
+import express, { Express, NextFunction, Request, Response } from 'express';
+import { AppDataSource } from '../data-source';
+import { Product } from '../entities/product.entity';
+// import { CategoryInterface, SeparatingCategory } from '../entities/schemas/category-schema';
+import { CategoryView } from '../entities/views/category-view.entity';
 
-import passport from "passport";
+const router = express.Router();
 
-import { AppDataSource } from "../data-source";
-import indexRouter from "../routes/index";
-import categoryRouter from "../routes/category/router";
-import customerRouter from "../routes/customer/router";
-import employeeRouter from "../routes/employee/router";
-import suppliersRouter from "../routes/supplier/router";
-import productsRouter from "../routes/product/router";
-import ordersRouter from "../routes/order/router";
-import loginRouter from "../routes/login/router";
-import cartRouter from "../routes/cart/router";
-const {
-  passportVerifyAccount,
-  passportVerifyToken,
-} = require("./middlewares/passport");
+const repository = AppDataSource.getRepository(Product);
+// const categoryRepository = AppDataSource.getRepository<CategoryInterface>(SeparatingCategory); 
+const viewRepository = AppDataSource.getRepository(CategoryView);
+// console.log("SeparatingCategory", SeparatingCategory);
 
-function ignoreFavicon(req: any, res: any, next: any) {
-  if (req.originalUrl.includes('favicon.ico')) {
-    res.status(204).end()
-  }
-  next();
-}
-
-
-const cors = require("cors");
-
-const app: Express = express();
-//ADD CORS
-app.use(
-  cors({
-    origin: "*",
-  })
-);
-
-app.use(ignoreFavicon);
-
-AppDataSource.initialize().then(async () => {
-  console.log("Data source initialized");
-
-  app.use(logger("dev"));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser());
-  app.use(express.static(path.join(__dirname, "public")));
-
-  passport.use(passportVerifyAccount);
-  passport.use(passportVerifyToken);
-
-  app.use("/", indexRouter);
-  app.use("/categories", categoryRouter);
-  app.use(
-    "/products",
-    // passport.authenticate("jwt", { session: false }),
-    productsRouter
-  );
-  app.use("/suppliers", suppliersRouter);
-  app.use("/customers", customerRouter);
-  app.use("/employees", employeeRouter);
-  app.use("/orders", ordersRouter);
-  app.use("/login", loginRouter);
-
-  app.use("/cart", cartRouter);
-
-  // catch 404 and forward to error handler
-  app.use(function (req, res, next) {
-    res.status(404).send("Not found");
-    // next(createError(404));
-  });
-
-  // error handler
-  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
-
-    // render the error page
-    res.status(err.status || 500);
-    res.render("error");
-  });
-
-  app.use(express.static('public'))
+/* GET home page. */
+router.get('/', function (req: Request, res: Response, next: any) {
+  res.json({ message: 'Hello world!' });
 });
 
-export default app;
+// router.get('/call-separating-entity', async (req: Request, res: Response, next: any) => {
+//   try {
+//     const categories = await categoryRepository.find();
+//     res.json(categories);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// Get Order by orderId
+router.get('/call-raw-sql', async (req: Request, res: Response, next: any) => {
+  try {
+    const results = await repository.manager.connection.query('SELECT * FROM Orders AS O WHERE O.OrderId = @0', [38]);
+    res.json(results);
+    // res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get Products by Discount
+router.get('/call-stored-procedure', async (req: Request, res: Response, next: any) => {
+  try {
+    const results = await repository.manager.connection.query('EXECUTE [dbo].[usp_Products_GetByDiscount] @0', [15]);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get Products by Discount >= 45 
+router.get('/super-sale', async (req: Request, res: Response, next: any) => {
+  try {
+    const query = 'SELECT * FROM Products as p WHERE p.Discount >= 40';
+    const results = await repository.manager.connection.query(query);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+// Hiển thị năm sinh của khách hàng 
+router.get('/customers/get-by-year-of-birthday/:year', async (req: Request, res: Response, next: any) => {
+  try {
+    const results = await repository.manager.connection.query('EXECUTE [dbo].[usp_GetCustomerYear] @0', [req.params.year]);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//Hiển thị các đơn hàng có trạng thái trong ngày
+router.get('/get-order-status-date', async (req: Request, res: Response, next: any) => {
+  try {
+    const date = req.query.date;
+    const status = req.query.status
+    const results = await repository.manager.connection.query('EXECUTE [dbo].[usp_GetOrderStatusDay] @Date = @0, @Status = @1', [date,status ]);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// HIển thị các đơn hàng ko bán dc trong khoảng ngày 
+router.get('/get-order-product-not-sell', async (req: Request, res: Response, next: any) => {
+  try {
+    const fromDate = req.query.date;
+    const toDate = req.query.date
+    const results = await repository.manager.connection.query('EXECUTE [dbo].[usp_ProductNotSell] @FromDate = @0, @ToDate = @1', [fromDate, toDate ]);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// HIển thị các khách hàng mua trong khoảng ngày ERROR
+router.get('/get-customer-buy-onday', async (req: Request, res: Response, next: any) => {
+  try {
+    // const fromDate = req.query.datetime;
+    // const toDate = req.query.datetime
+    const results = await repository.manager.connection.query('EXECUTE [dbo].[usp_Customer_BuyDay] @FromDate = @0, @ToDate = @1', ['2023-01-01', '2023-12-01' ]);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//Hiển thị khách hàng từ tuổi tới tuổi 
+router.get('/get-age-customer', async(req: Request, res: Response, next:any)=> {
+  try {
+    // const minAge = req.query.int;
+    // const maxAge = req.query.int; 
+    const results = await repository.manager.connection.query('EXECUTE [dbo].[usp_GetAgeCustomerFromTo] @MinAge = @0, @MaxAge = @1', [10, 20]);
+    res.json(results)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error:'Internal server error'})
+  }
+}) 
+
+router.get('/view', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const categories = await viewRepository.find();
+
+    if (categories.length === 0) {
+      res.status(204).send();
+    } else {
+      res.json(categories);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+interface AnyObject {
+  [key: string]: any;
+}
+
+function toCamelCase(o: AnyObject) {
+  var newO: AnyObject = {},
+    origKey: string,
+    newKey: string,
+    value: any;
+  if (o instanceof Array) {
+    return o.map(function (value) {
+      if (typeof value === 'object') {
+        value = toCamelCase(value);
+      }
+      return value;
+    });
+  } else {
+    for (origKey in o) {
+      if (o.hasOwnProperty(origKey)) {
+        newKey = (origKey.charAt(0).toLowerCase() + origKey.slice(1) || origKey).toString();
+        value = o[origKey];
+        if (value instanceof Array || (value !== null && value.constructor === Object)) {
+          value = toCamelCase(value);
+        }
+        newO[newKey] = value;
+      }
+    }
+  }
+  return newO;
+}
+
+export default router;

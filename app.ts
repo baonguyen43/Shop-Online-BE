@@ -7,7 +7,7 @@ import path from "path";
 import passport from "passport";
 
 import { AppDataSource } from "./data-source";
-import indexRouter from "./routes/index";
+import indexRouter from "./api/index";
 import categoryRouter from "./routes/category/router";
 import customerRouter from "./routes/customer/router";
 import employeeRouter from "./routes/employee/router";
