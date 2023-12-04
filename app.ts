@@ -84,6 +84,8 @@ AppDataSource.initialize().then(async () => {
     res.status(err.status || 500);
     res.render("error");
   });
+
+  app.use(express.static('public'))
 });
 
 export default app;
