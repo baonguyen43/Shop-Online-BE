@@ -21,6 +21,14 @@ const {
   passportVerifyToken,
 } = require("./middlewares/passport");
 
+function ignoreFavicon(req: any, res: any, next: any) {
+  if (req.originalUrl.includes('favicon.ico')) {
+    res.status(204).end()
+  }
+  next();
+}
+
+
 const cors = require("cors");
 
 const app: Express = express();
@@ -30,6 +38,9 @@ app.use(
     origin: "*",
   })
 );
+
+app.use(ignoreFavicon);
+
 AppDataSource.initialize().then(async () => {
   console.log("Data source initialized");
 
