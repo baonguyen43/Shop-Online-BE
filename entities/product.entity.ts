@@ -59,8 +59,6 @@ export class Product extends BaseEntity {
   // ----------------------------------------------------------------------------------------------
   // IMAGEPATH
   // ----------------------------------------------------------------------------------------------
-  @IsNotEmpty({message:"Đường dẫn ảnh không được bỏ trống"})
-  @Length(5,300,{message:"Đường dẫn ảnh không được ngắn hơn $constraint1 và dài hơn $constraint2 ký tự "})
   @Column({ name: 'ImagePath', type: 'nvarchar', length: 'MAX', nullable: true })
   imagePath: string;
 

@@ -112,14 +112,14 @@ module.exports = {
         
               const order = req.body as Order;
         
-              // Lưu thông tin order
               const result = await queryRunner.manager.save(Order, order);
-        
-              // Lưu thông tin order details
-              const orderDetails = order.orderDetails.map((od) => {
+              
+              let orderDetails: any[] = [];
+              if(order.orderDetails)
+         {      orderDetails = order.orderDetails.map((od) => {
                 return { ...od, orderId: result.id };
               });
-        
+        }
               await queryRunner.manager.save(OrderDetail, orderDetails);
         
               // Commit transaction
@@ -149,7 +149,7 @@ module.exports = {
         }
     
         // Cập nhật trạng thái của order
-        if (status === 'CANCELED' || status === 'REJECTED' || status === 'COMPLETED') {
+        if (status === 'CANCELED' || status === 'COMPLETED' || status === 'WAITTING') {
           order.status = status;
           await repository.save(order);
           res.json(order);
@@ -162,5 +162,23 @@ module.exports = {
       }
     }, 
 
+    updateOrderDetail: async (req: Request, res: Response, next: any) => {
+      try {
+        const orderDetails = req.body.orderDetails;
     
+        const order = await repository.findOneBy({ id: parseInt(req.params.id) });
+        if (!order) {
+          return res.status(404).json({ error: 'Đơn hàng không tồn tại' });
+        }
+    
+        // Cập nhật thông tin orderDetails
+        order.orderDetails = orderDetails;
+        await repository.save(order);
+    
+        res.json({ message: 'Cập nhật thành công' });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Lỗi máy chủ' });
+      }
+    },
 }

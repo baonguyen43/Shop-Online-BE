@@ -4,12 +4,15 @@ import express from 'express';
 const {validateSchema} = require("../../helper/validateSchema")
 const {createSchema} = require("./validation");
 const router = express.Router();
-const {getAll, getDetail, create,updateStatus } = require("./controller")
+const {getAll, getDetail, create,updateStatus , updateOrderDetail} = require("./controller")
 
-router.route("/").get(getAll).post(validateSchema(createSchema),create); 
+router.route("/").get(getAll).post(create); 
 
 router.route("/:id")
         .get(getDetail)
+        .put(updateOrderDetail)
+
 router.route("/status/:id")
-        .patch(updateStatus)
+        .put(updateStatus, updateOrderDetail)
+    
 export default router;

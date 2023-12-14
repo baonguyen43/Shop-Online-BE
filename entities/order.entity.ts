@@ -16,22 +16,22 @@ export class Order {
   // CreatedDate
   // -----------------------------------------------------------
   // @IsDateString()
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @Column({ name: 'CreatedDate', type: 'datetime', default: ()=>'GETDATE()'})
   createdDate: Date;
 
   // ----------------------------------------------------------
   // ShippedDate
   // -----------------------------------------------------------
-  @IsNotEmpty()
-  @IsDateString()
-  @Column({ name: 'ShippedDate', type: 'datetime', nullable:true })
+  // @IsNotEmpty()
+  // @IsDateString()
+  @Column({ name: 'ShippedDate', type: 'datetime', default: ()=>'GETDATE()' })
   shippedDate: Date;
 
   // ----------------------------------------------------------------------------------------------
   // Status
   // ----------------------------------------------------------------------------------------------
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @IsIn(['WAITTING', 'COMPLETED', 'CANCEL'], { message: 'Trạng thái không hợp lệ' })
   @Column({ name: 'Status', length: 50, default:'WAITTING' })
   status: string;
@@ -39,9 +39,9 @@ export class Order {
   // ----------------------------------------------------------------------------------------------
   // Description
   // ----------------------------------------------------------------------------------------------
-  @IsNotEmpty({message:"Mô tả không được bỏ trống"})
+  // @IsNotEmpty({message:"Mô tả không được bỏ trống"})
   @Length(5,300,{message:"Mô tả không được ngắn hơn $constraint1 và dài hơn $constraint2 ký tự "})
-  @Column({ name: 'Description', length: 500 })
+  @Column({ name: 'Description', length: 500, nullable:true })
   description: string;
 
   // ----------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ export class Order {
   // ----------------------------------------------------------------------------------------------
   // PaymentType
   // ----------------------------------------------------------------------------------------------
-  @IsNotEmpty({message:"Phương thức thanh toán không được bỏ trống"})
+  // @IsNotEmpty({message:"Phương thức thanh toán không được bỏ trống"})
   @Column({ name: 'PaymentType', length:20, default:'CASH'})
   @IsIn(['CASH', 'CREDIT CARD'], { message: 'Phương thức thanh toán không hợp lệ' })
   paymentType: string;
