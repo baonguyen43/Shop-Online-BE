@@ -3,10 +3,15 @@ import { AppDataSource } from '../data-source';
 import { Product } from '../entities/product.entity';
 // import { CategoryInterface, SeparatingCategory } from '../entities/schemas/category-schema';
 import { CategoryView } from '../entities/views/category-view.entity';
+import { Like } from 'typeorm';
+import { Customer } from '../entities/customer.entity';
+import { Order } from '../entities/order.entity';
 
 const router = express.Router();
 
 const repository = AppDataSource.getRepository(Product);
+const repositoryCustomer = AppDataSource.getRepository(Customer);
+const repositoryOrder = AppDataSource.getRepository(Order);
 // const categoryRepository = AppDataSource.getRepository<CategoryInterface>(SeparatingCategory); 
 const viewRepository = AppDataSource.getRepository(CategoryView);
 // console.log("SeparatingCategory", SeparatingCategory);
@@ -61,7 +66,167 @@ router.get('/super-sale', async (req: Request, res: Response, next: any) => {
   }
 });
 
+// LẤY SẢN PHẨM THEO GIẢM GIÁ
+router.get('/product-discount', async (req: Request, res: Response, next: any) => {
+  try {
+    const discount = req.query.discount 
+    const query = `SELECT * FROM Products as p WHERE p.discount >= ${discount}`;
+    const results = await repository.manager.connection.query(query);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
+
+// LẤY SẢN PHẨM THEO TỒN KHO
+router.get('/product-stockless', async (req: Request, res: Response, next: any) => {
+  try {
+    const stock = req.query.stock 
+    const query = `SELECT * FROM Products as p WHERE p.Stock < ${stock}`;
+    const results = await repository.manager.connection.query(query);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// LẤY SẢN PHẨM THEO DANH MỤC, NHÀ CUNG CẤP 
+router.get('/product-category', async (req: Request, res: Response, next: any) => {
+  try {
+    const category = req.query.category  
+
+    // TRẢ DATA KHI CHƯA NHẬP CATEGORY
+    // const products = await repository.find({
+    //   where: {
+    //     category: {
+    //       name: Like(`%${category}%`),
+    //     },
+    //   },
+    //   relations: ['category'],
+    // });
+
+    // KHÔNG TRẢ DATA KHI CHƯA NHẬP CATEGORY
+ let whereCondition = {};
+    if (category) {
+      whereCondition = {
+        category: {
+          name: Like(`%${category}%`),
+        },
+      };
+    } else {
+      // Nếu không có giá trị cho category, trả về mảng rỗng
+      res.json([]);
+      return;
+    }
+    const products = await repository.find({
+      where: whereCondition,
+      relations: ['category'],
+    });
+
+    res.json(toCamelCase(products));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/product-supplier', async (req: Request, res: Response, next: any) => {
+  try {
+    const supplier = req.query.supplier  
+    const products = await repository.find({
+      where: {
+        supplier: {
+          name: Like(`%${supplier}%`),
+        },
+      },
+      relations: ['supplier'],
+    });
+    res.json(toCamelCase(products));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// SẢN PHẨM  có Giá bán nhỏ hơn 
+router.get('/product-pricediscount', async (req: Request, res: Response, next: any) => {
+  try {
+    const total = req.query.total
+    const query = `EXECUTE [dbo].[usp_GetProductsWith] @Total = ${total}` 
+    const results = await repository.manager.connection.query(query);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// SẢN PHẨM  không bán được trong khoảng ngày 
+router.get('/product-notsell', async (req: Request, res: Response, next: any) => {
+  try {
+    const fromDate = req.query.fromDate
+    const toDate = req.query.toDate
+    const query = `EXECUTE [dbo].[usp_ProductNotSell] @FromDate = '${fromDate}',@ToDate = '${toDate}'  ` 
+    const results = await repository.manager.connection.query(query);
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// SẢN PHẨM  bán  được trong khoảng ngày 
+router.get('/products-sold', async (req: Request, res: Response, next: any) => {
+  try {
+    const fromDate = req.query.fromDate;
+    const toDate = req.query.toDate;
+    
+    const query = `EXECUTE [dbo].[usp_ProductSell] @FromDate = '${fromDate}', @ToDate ='${toDate}'`;
+    const results = await repository.manager.connection.query(query);
+    
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+// KHÁCH HÀNG 
+// Hiển thị khách hàng theo địa chỉ
+router.get('/customers-address', async (req: Request, res: Response, next: any) => {
+  try {
+    const address = req.query.address;
+    const query = `EXECUTE [dbo].[usp_GetCustomerAddress] @Address = ${address}`;
+    const results = await repositoryCustomer.manager.connection.query(query);
+    
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// các khách hàng có tuổi từ
+router.get('/customers-age', async (req: Request, res: Response, next: any) => {
+  try {
+    const minAge = req.query.minAge;
+    const maxAge = req.query.maxAge;
+    const query = `EXECUTE [dbo].[usp_CustomerAge] @MinAge = ${minAge}, @MaxAge=${maxAge}`;
+    const results = await repositoryCustomer.manager.connection.query(query);
+    
+    res.json(toCamelCase(results));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Hiển thị năm sinh của khách hàng 
 router.get('/customers/get-by-year-of-birthday/:year', async (req: Request, res: Response, next: any) => {
@@ -74,6 +239,37 @@ router.get('/customers/get-by-year-of-birthday/:year', async (req: Request, res:
   }
 });
 
+
+// ORDER
+router.get('/orders-status', async (req, res) => {
+  try {
+    const date = req.query.date;
+    const status = req.query.status;
+    const query = `EXECUTE [dbo].[usp_OrderStatus] @Date = '${date}', @Status = '${status}'`;
+    
+    const results = await repositoryOrder.manager.connection.query(query);
+    
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/orders-payment', async (req, res) => {
+  try {
+    const paymentMethod = req.query.paymentMethod;
+    const status = req.query.status;
+    const query = `EXECUTE [dbo].[usp_OrdersPayment] @PaymentMethod = '${paymentMethod}', @Status = '${status}'`;
+    
+    const results = await repositoryOrder.manager.connection.query(query);
+    
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 //Hiển thị các đơn hàng có trạng thái trong ngày
 router.get('/get-order-status-date', async (req: Request, res: Response, next: any) => {
   try {
